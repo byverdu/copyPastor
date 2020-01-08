@@ -14,14 +14,15 @@
     "storage"
   ],
   "background": {
-    "scripts": ["static/scripts/contextMenu.js"]
+    "scripts": ["static/scripts/background.js"],
+    "persistent": false
   },
   "content_scripts": [
     {
     "matches": ["<all_urls>"],
     "js": ["static/scripts/content.js"]
     }
-   ],
+  ],
   "browser_action": {
     "default_icon": "images/16.png",
     "default_popup": "static/popup.html"
