@@ -7,51 +7,26 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
 var HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
-
-function recursiveIssuer(m) {
-  if (m.issuer) {
-    return recursiveIssuer(m.issuer);
-  } else if (m.name) {
-    return m.name;
-  } else {
-    return false;
-  }
-}
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: "development",
   entry: {
-    react: `${__dirname}/src/index.tsx`,
-    hello: `${__dirname}/src/hello`,
-    world: `${__dirname}/src/world`
+    // react: `${__dirname}/src/index.tsx`,
+    // test: path.resolve(__dirname, `src/test/test.tsx`),
+    test: `${__dirname}/src/lib/test`,
+    // copy: `${__dirname}/src/copy`,
+    // world: `${__dirname}/src/world`
   },
+
+  cache: false,
 
   output: {
     path: __dirname + '/build',
     filename: '[name]/[name].js',
     libraryTarget: 'umd'
   },
-
-  // optimization: {
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       helloStyles: {
-  //         name: 'hello',
-  //         test: (m, c, entry = 'hello') =>
-  //           m.constructor.name === 'CssModule' && recursiveIssuer(m) === entry,
-  //         chunks: 'all',
-  //         enforce: true,
-  //       },
-  //       worldStyles: {
-  //         name: 'world',
-  //         test: (m, c, entry = 'world') =>
-  //           m.constructor.name === 'CssModule' && recursiveIssuer(m) === entry,
-  //         chunks: 'all',
-  //         enforce: true,
-  //       },
-  //     },
-  //   },
-  // },
 
   // Enable sourcemaps for debugging webpack's output.
   devtool: "source-map",
@@ -73,21 +48,23 @@ module.exports = {
   },
 
   plugins: [
-    new StaticSiteGeneratorPlugin({
-      globals: {
-        window: {}
-      },
-      entry: 'react',
-      paths: [
-        'hello',
-        'world'
-      ]
+    new CleanWebpackPlugin(),
+
+    new HtmlWebpackPlugin({
+      filename: 'test/test.html',
+      // template: '!!prerender-loader?string!src/test.html',
+      template: `!!prerender-loader?string&entry=src/lib/test/index.tsx!${path.resolve(__dirname, "src/lib/test", "test.html")}`,
+
     }),
 
-    new MiniCssExtractPlugin({
-      filename: '[name]/[name].css',
-      chunkFilename: '[id].css',
-    }),
+    // new HtmlWebpackPlugin({
+    //   filename: 'copy/copy.html',
+    // //   // template: '!!prerender-loader?string!src/copy.html',
+    //   template: `!!prerender-loader?string&entry=src/copy.tsx!${path.resolve(__dirname, "src", "copy.html")}`,
+    // }),
+
+    new ForkTsCheckerWebpackPlugin()
+
   ],
 
   module: {
@@ -97,20 +74,27 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: "ts-loader"
+            loader: "ts-loader",
+            options: {
+              transpileOnly: true
+            }
           }
         ]
       },
       {
         test: /\.s[ac]ss$/i,
         use: [
+          "style-loader",
+          "@teamsupercell/typings-for-css-modules-loader",
           {
-            loader: 'file-loader',
+            loader: "css-loader",
             options: {
-              name: '[name]/[name].css',
-            }
+              modules: {
+                localIdentName: '[name]__[local]--[hash:base64:5]',
+              }
+            },
           },
-          "sass-loader"
+          "sass-loader",
         ]
       }
     ]
