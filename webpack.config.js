@@ -1,69 +1,93 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
-const StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-const HTMLInlineCSSWebpackPlugin = require("html-inline-css-webpack-plugin").default;
-var HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const RemovePlugin = require('remove-files-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const ENV = process.env.ENV;
 
 module.exports = {
-  mode: "development",
+  mode: ENV,
   entry: {
-    // react: `${__dirname}/src/index.tsx`,
-    // test: path.resolve(__dirname, `src/test/test.tsx`),
-    test: `${__dirname}/src/lib/test`,
-    // copy: `${__dirname}/src/copy`,
-    // world: `${__dirname}/src/world`
+    reactPopup: `${__dirname}/src/pages/popup/index.tsx`,
+    reactBackground: `${__dirname}/src/pages/background/index.tsx`,
+    helper: `${__dirname}/src/lib/helper.ts`,
+    logger: `${__dirname}/src/lib/logger.ts`,
+    popup: `${__dirname}/src/scripts/popup.ts`,
+    background: `${__dirname}/src/scripts/background.ts`
   },
 
   cache: false,
 
   output: {
-    path: __dirname + '/build',
-    filename: '[name]/[name].js',
+    path: ENV === 'development' ? __dirname + '/dev-build' :  __dirname + '/build',
+    filename: 'scripts/[name].js',
     libraryTarget: 'umd'
   },
 
   // Enable sourcemaps for debugging webpack's output.
-  devtool: "source-map",
-
-  devServer: {
-    contentBase: './build'
-  },
+  devtool: ENV === 'development' ? 'source-map' : undefined,
 
   resolve: {
+    alias: {
+      style: path.resolve(__dirname, 'src', 'pages/styles')
+    },
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: ['.ts', '.tsx', '.js', '.scss'],
     modules: [path.join(__dirname, 'node_modules')],
     plugins: [
       new TsconfigPathsPlugin({
         configFile: './tsconfig.json',
-        baseUrl: 'src',
+        baseUrl: 'src'
       }),
     ],
   },
 
   plugins: [
+    new webpack.WatchIgnorePlugin([
+      /css\.d\.ts$/
+    ]),
     new CleanWebpackPlugin(),
 
-    new HtmlWebpackPlugin({
-      filename: 'test/test.html',
-      // template: '!!prerender-loader?string!src/test.html',
-      template: `!!prerender-loader?string&entry=src/lib/test/index.tsx!${path.resolve(__dirname, "src/lib/test", "test.html")}`,
+    // Webpack plugin that runs TypeScript type checker on a separate process.
+    new ForkTsCheckerWebpackPlugin(),
 
+    new HtmlWebpackPlugin({
+      excludeChunks: [ 'reactPopup', 'reactBackground', 'background', 'logger', 'helper' ],
+      filename: 'static/popup.html',
+      template: `!!prerender-loader?string&entry=src/pages/popup/index.tsx!${path.resolve(__dirname, 'src/pages/popup', 'popup.html')}`,
     }),
 
-    // new HtmlWebpackPlugin({
-    //   filename: 'copy/copy.html',
-    // //   // template: '!!prerender-loader?string!src/copy.html',
-    //   template: `!!prerender-loader?string&entry=src/copy.tsx!${path.resolve(__dirname, "src", "copy.html")}`,
-    // }),
+    new HtmlWebpackPlugin({
+      excludeChunks: [ 'reactPopup', 'reactBackground', 'popup', 'logger', 'helper' ],
+      filename: 'static/background.html',
+      template: `!!prerender-loader?string&entry=src/pages/background/index.tsx!${path.resolve(__dirname, 'src/pages/background', 'background.html')}`,
+    }),
 
-    new ForkTsCheckerWebpackPlugin()
+    new RemovePlugin({
+      after: {
+          root: './build/scripts/',
+          include: [
+              'react.js',
+              'reactBackground.js',
+              'reactPopup.js'
+          ],
+      }
+  }),
+
+  new CopyPlugin([
+    {
+      from: 'static/images/*',
+      to: './images',
+      flatten: true
+    },
+    {
+      from: 'manifest.json',
+      to: './'
+    }
+  ]),
 
   ],
 
@@ -74,7 +98,7 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: "ts-loader",
+            loader: 'ts-loader',
             options: {
               transpileOnly: true
             }
@@ -84,17 +108,17 @@ module.exports = {
       {
         test: /\.s[ac]ss$/i,
         use: [
-          "style-loader",
-          "@teamsupercell/typings-for-css-modules-loader",
+          'style-loader',
+          'css-modules-typescript-loader',
           {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {
               modules: {
                 localIdentName: '[name]__[local]--[hash:base64:5]',
               }
             },
           },
-          "sass-loader",
+          'sass-loader',
         ]
       }
     ]

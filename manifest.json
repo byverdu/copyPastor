@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "CopyPastor",
-  "description": "Keep a track of what you copy/paste on the web",
+  "description": "Keep track of what you copy/paste on the web",
   "version": "1.0",
   "icons": {
     "128": "images/128.png",

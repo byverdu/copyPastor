@@ -1,1 +1,5 @@
 .history
+node_modules
+yarn-error.log
+dev-build
+.DS_Store
