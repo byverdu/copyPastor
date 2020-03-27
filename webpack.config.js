@@ -1,11 +1,12 @@
 const path = require('path');
 const webpack = require('webpack');
 const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const RemovePlugin = require('remove-files-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+
 const ENV = process.env.ENV;
 
 module.exports = {
@@ -16,7 +17,8 @@ module.exports = {
     helper: `${__dirname}/src/lib/helper.ts`,
     logger: `${__dirname}/src/lib/logger.ts`,
     popup: `${__dirname}/src/scripts/popup.ts`,
-    background: `${__dirname}/src/scripts/background.ts`
+    background: `${__dirname}/src/scripts/background.ts`,
+    content: `${__dirname}/src/scripts/content.ts`
   },
 
   cache: false,
@@ -31,11 +33,8 @@ module.exports = {
   devtool: ENV === 'development' ? 'source-map' : undefined,
 
   resolve: {
-    alias: {
-      style: path.resolve(__dirname, 'src', 'pages/styles')
-    },
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ['.ts', '.tsx', '.js', '.scss'],
+    extensions: ['.ts', '.tsx', '.js', '.scss', '.json'],
     modules: [path.join(__dirname, 'node_modules')],
     plugins: [
       new TsconfigPathsPlugin({
@@ -49,7 +48,9 @@ module.exports = {
     new webpack.WatchIgnorePlugin([
       /css\.d\.ts$/
     ]),
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanStaleWebpackAssets: false,
+    }),
 
     // Webpack plugin that runs TypeScript type checker on a separate process.
     new ForkTsCheckerWebpackPlugin(),
@@ -79,7 +80,7 @@ module.exports = {
 
   new CopyPlugin([
     {
-      from: 'static/images/*',
+      from: 'src/images/*',
       to: './images',
       flatten: true
     },
