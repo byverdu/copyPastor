@@ -2,7 +2,7 @@
   "compilerOptions": {
       "baseUrl": "./src",
       "paths": {
-        "Styles/*": [ "pages/styles/*" ],
+        "Styles/*": [ "styles/*" ],
         "Types/*": [ "types/*" ],
         "Lib/*": [ "lib/*" ],
       },
