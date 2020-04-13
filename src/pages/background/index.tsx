@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 
 import Header from '../../components/Header'
 
-import testHelper from '../../lib/helper';
-import styles from '../styles/background.scss';
+import testHelper from 'Lib/helper';
+
+import 'styles/background.scss';
 
 const LandingPage = () => (
-  <div className={styles["background-container"]}>
+  <div className="background-container">
     <Header
       title={`Background page ${testHelper('Marla byverdu')}` }
     />
