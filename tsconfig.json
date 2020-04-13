@@ -4,7 +4,7 @@
       "paths": {
         "Styles/*": [ "styles/*" ],
         "Types/*": [ "types/*" ],
-        "Lib/*": [ "lib/*" ],
+        "Lib/*": [ "lib/*" ]
       },
       "sourceMap": true,
       "noImplicitAny": false,
@@ -15,7 +15,7 @@
       "allowSyntheticDefaultImports": true,
       "lib": [
         "dom",
-        "es2015",
+        "es2015"
       ],
       "types":[
         "chrome",
