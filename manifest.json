@@ -11,10 +11,13 @@
   "permissions": [
     "activeTab",
     "contextMenus",
-    "storage"
+    "storage",
+    "clipboardRead",
+    "clipboardWrite",
+    "unlimitedStorage"
   ],
   "background": {
-    "scripts": ["static/scripts/background.js"],
+    "scripts": ["scripts/background.js"],
     "persistent": false
   },
   "content_scripts": [

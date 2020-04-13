@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom';
 
 import Header from '../../components/Header'
 
-import testHelper from '../../lib/helper';
-import styles from '../styles/popup.scss';
+import testHelper from 'Lib/helper';
+import 'styles/popup.scss';
 
 const LandingPage = () => (
-  <div className={styles["popup-container"]}>
-    <Header
-      title={`Popup page ${testHelper('Albert byverdu')}` }
-    />
-    <div className="target">xoxo</div>
-  </div>
+	<div className="popup-container">
+		<Header title={`Popup page ${testHelper('Albert byverdu')}` }/>
+		<div className="test" />
+		<button className="target">Open full history</button>
+		<button className="clear">clear</button>
+	</div>
 );
 
 export default () => {
