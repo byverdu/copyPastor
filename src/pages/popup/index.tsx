@@ -1,20 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
-import Header from '../../components/Header'
+import "styles/popup.scss";
 
-import testHelper from '../../lib/helper';
-import styles from '../styles/popup.scss';
-
-const LandingPage = () => (
-  <div className={styles["popup-container"]}>
-    <Header
-      title={`Popup page ${testHelper('Albert byverdu')}` }
-    />
-    <div className="target">xoxo</div>
+const PopUpPage = () => (
+  <div className="popup-container">
+    <div className="btn-wrapper">
+      <button className="btn delete-selected">Delete Selected</button>
+      <button className="btn clear-history">Clear History</button>
+    </div>
+    <div className="history-content" />
   </div>
 );
 
 export default () => {
-  ReactDOM.render(<LandingPage />, document.getElementById('root'))
-}
+  ReactDOM.render(<PopUpPage />, document.getElementById("root"));
+};
