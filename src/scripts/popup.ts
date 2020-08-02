@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyContent = document.querySelector(".history-content");
 
   clearBtn.addEventListener("click", () => {
-    chrome.runtime.sendMessage("delete", (response) => {
+    chrome.runtime.sendMessage({ msg: "clear-history" }, (response) => {
       console.log(response);
       historyContent.innerHTML = "";
     });

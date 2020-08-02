@@ -12,9 +12,7 @@ document.addEventListener("copy", () => {
         ? [...copyPastorHistory, selectedText]
         : [selectedText];
 
-      copyPastor.set({ copyPastorHistory: newStorage }, function () {
-        console.log(`copyPastorHistory length is ${newStorage.length}`);
-      });
+      chrome.runtime.sendMessage({ msg: "save-history", payload: newStorage });
     });
   }
 });
