@@ -1,5 +1,5 @@
-import { copyPastor, getRandomNumber } from "Lib/helper";
-import { CopyPastorItem } from "Types";
+import { copyPastor, getRandomNumber, msgSenderHandler } from "Lib/helper";
+import { CopyPastorItem, CopyPastorMessageEnum } from "Types";
 
 const dates = [1596442964138, 328402800000, 1387065600000];
 const date = dates[Math.ceil(Math.random() * dates.length - 1)];
@@ -23,7 +23,10 @@ document.addEventListener("copy", () => {
         ? [...copyPastorHistory, newItem]
         : [newItem];
 
-      chrome.runtime.sendMessage({ msg: "save-history", payload: newStorage });
+      msgSenderHandler({
+        msg: CopyPastorMessageEnum["save-history"],
+        payload: newStorage,
+      });
     });
   }
 });

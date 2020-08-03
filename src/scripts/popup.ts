@@ -1,4 +1,4 @@
-import { createOrderedList, copyPastor } from "Lib/helper";
+import { createOrderedList, copyPastor, msgSenderHandler } from "Lib/helper";
 import {
   CopyPastorSyncStorageTypes,
   CopyPastorMessage,
@@ -34,10 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyContent = document.querySelector(".history-content");
 
   clearBtn.addEventListener("click", () => {
-    chrome.runtime.sendMessage({ msg: "clear-history" }, (response) => {
-      console.log(response);
-      historyContent.innerHTML = "";
-    });
+    msgSenderHandler(
+      { msg: CopyPastorMessageEnum["clear-history"] },
+      (response) => {
+        console.log(response);
+        historyContent.innerHTML = "";
+      }
+    );
   });
 
   const deleteSelectedHandler = (storage: CopyPastorItem[]) => {

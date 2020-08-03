@@ -2,6 +2,7 @@ import {
   CopyPastorSyncStorage,
   CopyPastorSyncStorageTypes,
   CopyPastorItem,
+  CopyPastorMessage,
 } from "Types/index";
 
 export const copyPastor = {
@@ -116,3 +117,24 @@ export const createOrderedList = (
 
   return div;
 };
+
+export const msgReceiverHandler = (
+  callback: (
+    request: CopyPastorMessage,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (resp: any) => void
+  ) => void
+) => chrome.runtime.onMessage.addListener(callback);
+
+export const msgSenderHandler = (
+  { msg, payload, type }: CopyPastorMessage,
+  callback?: (resp: any) => void
+) =>
+  chrome.runtime.sendMessage(
+    {
+      msg,
+      payload,
+      type,
+    },
+    callback
+  );
