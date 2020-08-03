@@ -1,4 +1,8 @@
-import { CopyPastorSyncStorage, CopyPastorSyncStorageTypes } from "Types/index";
+import {
+  CopyPastorSyncStorage,
+  CopyPastorSyncStorageTypes,
+  CopyPastorItem,
+} from "Types/index";
 
 export const copyPastor = {
   set(items: CopyPastorSyncStorage, callback?: () => void) {
@@ -20,21 +24,6 @@ export const copyPastor = {
   },
 };
 
-type ClickHandler = (e: MouseEvent) => void;
-
-const createBtn = (
-  text: string,
-  id: string,
-  clickHandler: ClickHandler
-): HTMLButtonElement => {
-  const btn = document.createElement("button");
-  btn.textContent = text;
-  btn.id = id;
-  btn.addEventListener("click", clickHandler);
-
-  return btn;
-};
-
 const createSpan = (text: string): HTMLSpanElement => {
   const span = document.createElement("span");
   span.addEventListener("click", (e: MouseEvent) => {
@@ -53,30 +42,77 @@ const createSpan = (text: string): HTMLSpanElement => {
   return span;
 };
 
-const createInput = (index: string): HTMLInputElement => {
+export const getRandomNumber = (qtty: number = 5): string => {
+  const array = new Uint32Array(qtty);
+  return window.crypto.getRandomValues(array).join("-");
+};
+
+const createInput = (id: string): HTMLInputElement => {
   const input = document.createElement("input");
   input.setAttribute("type", "checkbox");
-  input.setAttribute("id", index);
+  input.setAttribute("id", id);
 
   return input;
 };
 
-export const createOrderedList = (entries: string[]): HTMLOListElement => {
-  const ol = document.createElement("ol");
-  ol.classList.add("history-list");
+const createLinkImg = (href: string): HTMLAnchorElement => {
+  const img = new Image();
+  const link = document.createElement("a");
 
-  entries.forEach((entry, index) => {
-    const li = document.createElement("li");
-    li.classList.add("history-list-item");
+  img.src = "../images/link.svg";
+  img.classList.add("link-img");
 
-    const span = createSpan(entry);
-    const input = createInput(`${index}`);
+  link.href = href;
+  link.target = "_blank";
+  link.classList.add("link");
+  link.appendChild(img);
 
-    li.appendChild(input);
-    li.appendChild(span);
+  return link;
+};
 
-    ol.appendChild(li);
-  });
+const createDateHeader = (date: string): HTMLHeadingElement => {
+  const header = document.createElement("h5");
+  header.textContent = date;
 
-  return ol;
+  return header;
+};
+
+export const createOrderedList = (
+  entries: CopyPastorItem[]
+): HTMLDivElement => {
+  const dates = [...new Set(entries.map((item) => item.date))].sort(
+    (a, b) => b - a
+  );
+  const entriesCopy = entries.slice();
+  const div = document.createElement("div");
+
+  while (dates.length > 0) {
+    const dateToString = new Date(dates[0]).toDateString();
+    const groupedByDate = entriesCopy.filter(({ date }) => date === dates[0]);
+    const ol = document.createElement("ol");
+    ol.classList.add("history-list");
+    const header = createDateHeader(dateToString);
+
+    groupedByDate.forEach((entry, index) => {
+      const li = document.createElement("li");
+      li.classList.add("history-list-item");
+
+      const span = createSpan(entry.copyText);
+      const input = createInput(entry.id);
+      const img = createLinkImg(entry.href);
+
+      li.appendChild(input);
+      li.appendChild(img);
+      li.appendChild(span);
+
+      ol.appendChild(li);
+    });
+
+    div.appendChild(header);
+    div.appendChild(ol);
+
+    dates.splice(0, 1);
+  }
+
+  return div;
 };

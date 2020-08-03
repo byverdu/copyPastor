@@ -1,10 +1,15 @@
 import { copyPastor } from "Lib/helper";
+import { CopyPastorItem } from "Types";
 
 const deleteHandler = () => copyPastor.remove("copyPastorHistory");
 
-const saveHistoryHandler = (copyPastorHistory) =>
-  copyPastor.set({ copyPastorHistory }, function () {
+const saveHistoryHandler = (
+  copyPastorHistory: CopyPastorItem[],
+  callback: () => void
+) =>
+  copyPastor.set({ copyPastorHistory }, () => {
     console.log(`copyPastorHistory length is ${copyPastorHistory.length}`);
+    setTimeout(callback, 2000);
   });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -13,7 +18,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return true;
   }
   if (request && request.msg && request.msg === "save-history") {
-    saveHistoryHandler(request.payload);
+    chrome.browserAction.setBadgeText({ text: "+ 1" });
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#00A86B" });
+
+    saveHistoryHandler(request.payload, () =>
+      chrome.browserAction.setBadgeText({ text: "" })
+    );
     return true;
   }
 });

@@ -1,5 +1,10 @@
 import { createOrderedList, copyPastor } from "Lib/helper";
-import { CopyPastorSyncStorageTypes, CopyPastorMessage } from "Types/index";
+import {
+  CopyPastorSyncStorageTypes,
+  CopyPastorMessage,
+  CopyPastorMessageEnum,
+  CopyPastorItem,
+} from "Types/index";
 
 chrome.runtime.onInstalled.addListener(function () {
   chrome.browserAction.setTitle({ title: "Aloha" });
@@ -15,7 +20,8 @@ function getStorageValues(
       } else {
         reject({
           type: `${storageType} Empty`,
-          msg: `No items found for ${storageType}`,
+          msg: CopyPastorMessageEnum.error,
+          payload: `No items found for ${storageType}`,
         });
       }
     });
@@ -34,14 +40,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  const deleteSelectedHandler = (storage: string[]) => {
+  const deleteSelectedHandler = (storage: CopyPastorItem[]) => {
     deleteBtn.addEventListener("click", () => {
-      const mappedStoredValues = new Map<number, string>([]);
+      const mappedStoredValues = new Map<string, CopyPastorItem>([]);
       const itemsToDelete = Array.from(
         document.querySelectorAll("input:checked")
-      ).map((item) => Number(item.id));
+      ).map((item) => item.id);
 
-      storage.forEach((item, index) => mappedStoredValues.set(index, item));
+      storage.forEach((item) => mappedStoredValues.set(item.id, item));
       itemsToDelete.forEach((item) => mappedStoredValues.delete(item));
 
       copyPastor.set(
@@ -57,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   getStorageValues()
-    .then((storage: string[]) => {
+    .then((storage: CopyPastorItem[]) => {
       if (storage.length > 0) {
         deleteSelectedHandler(storage);
         clearBtn.classList.remove("hidden");
@@ -67,6 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
     .catch((reason: CopyPastorMessage) => {
-      historyContent.textContent = reason.msg;
+      historyContent.textContent = reason.payload;
     });
 });
