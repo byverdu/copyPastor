@@ -22,8 +22,8 @@ const setFavoriteHandler = async (
 
       if (itemToEdit) {
         const favValue = !itemToEdit.favorite;
-        mappedStored.delete(id);
-        mappedStored.set(id, { ...itemToEdit, favorite: favValue });
+        mappedStored.get(id).favorite = favValue;
+
         const resp = favValue ? { msg: "set-fav" } : { msg: "unset-fav" };
 
         copyPastor.set({ copyPastorHistory: [...mappedStored.values()] }, () =>
