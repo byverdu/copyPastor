@@ -38,6 +38,16 @@ $bg: #ff5722;
       }
     }
 
+    .fav-star {
+      color: transparent;
+      stroke: black;
+
+      .selected {
+        color: orange;
+        stroke: orangered;
+      }
+    }
+
     .history {
       &-content {
         font-size: large;

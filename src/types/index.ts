@@ -5,13 +5,15 @@ export type CopyPastorItem = {
   copyText: string;
   date: number;
   id: string;
+  favorite: boolean;
 };
 
 export type CopyPastorMessageType =
   | "save-history"
   | "delete-selected"
   | "error"
-  | "clear-history";
+  | "clear-history"
+  | "set-favorite";
 
 export type CopyPastorSyncStorage = {
   [prop in CopyPastorSyncStorageTypes]?: CopyPastorItem[];
@@ -27,5 +29,6 @@ export enum CopyPastorMessageEnum {
   "save-history" = "save-history",
   "delete-selected" = "delete-selected",
   "error" = "error",
+  "set-favorite" = "set-favorite",
   "clear-history" = "clear-history",
 }

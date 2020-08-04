@@ -1,4 +1,4 @@
-import { copyPastor, msgReceiverHandler } from "Lib/helper";
+import { copyPastor, msgReceiverHandler, mappedStoredValues } from "Lib/helper";
 import { CopyPastorItem, CopyPastorMessageEnum } from "Types";
 
 const clearHistoryHandler = () => copyPastor.remove("copyPastorHistory");
@@ -11,6 +11,29 @@ const saveHistoryHandler = (
     console.log(`copyPastorHistory length is ${copyPastorHistory.length}`);
     setTimeout(callback, 2000);
   });
+
+const setFavoriteHandler = async (
+  id: string
+): Promise<{ msg: string } | undefined> =>
+  new Promise((resolve) =>
+    copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
+      const mappedStored = mappedStoredValues(copyPastorHistory);
+      const itemToEdit = mappedStored.get(id);
+
+      if (itemToEdit) {
+        const favValue = !itemToEdit.favorite;
+        mappedStored.delete(id);
+        mappedStored.set(id, { ...itemToEdit, favorite: favValue });
+        const resp = favValue ? { msg: "set-fav" } : { msg: "unset-fav" };
+
+        copyPastor.set({ copyPastorHistory: [...mappedStored.values()] }, () =>
+          resolve(resp)
+        );
+      } else {
+        copyPastor.set({ copyPastorHistory }, () => resolve(undefined));
+      }
+    })
+  );
 
 msgReceiverHandler((request, sender, sendResponse) => {
   if (
@@ -32,6 +55,14 @@ msgReceiverHandler((request, sender, sendResponse) => {
     saveHistoryHandler(request.payload, () =>
       chrome.browserAction.setBadgeText({ text: "" })
     );
+    return true;
+  }
+  if (
+    request &&
+    request.msg &&
+    request.msg === CopyPastorMessageEnum["set-favorite"]
+  ) {
+    setFavoriteHandler(request.payload).then((resp) => sendResponse(resp));
     return true;
   }
 });

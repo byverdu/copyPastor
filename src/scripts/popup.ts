@@ -1,4 +1,9 @@
-import { createOrderedList, copyPastor, msgSenderHandler } from "Lib/helper";
+import {
+  createOrderedList,
+  copyPastor,
+  msgSenderHandler,
+  mappedStoredValues,
+} from "Lib/helper";
 import {
   CopyPastorSyncStorageTypes,
   CopyPastorMessage,
@@ -37,25 +42,23 @@ document.addEventListener("DOMContentLoaded", () => {
     msgSenderHandler(
       { msg: CopyPastorMessageEnum["clear-history"] },
       (response) => {
-        console.log(response);
-        historyContent.innerHTML = "";
+        window.location.reload();
       }
     );
   });
 
   const deleteSelectedHandler = (storage: CopyPastorItem[]) => {
     deleteBtn.addEventListener("click", () => {
-      const mappedStoredValues = new Map<string, CopyPastorItem>([]);
+      const mappedStored = mappedStoredValues(storage);
       const itemsToDelete = Array.from(
         document.querySelectorAll("input:checked")
       ).map((item) => item.id);
 
-      storage.forEach((item) => mappedStoredValues.set(item.id, item));
-      itemsToDelete.forEach((item) => mappedStoredValues.delete(item));
+      itemsToDelete.forEach((item) => mappedStored.delete(item));
 
       copyPastor.set(
         {
-          copyPastorHistory: [...mappedStoredValues.values()],
+          copyPastorHistory: [...mappedStored.values()],
         },
         function () {
           console.log(`copyPastorHistory has been saved`);

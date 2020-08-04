@@ -3,6 +3,7 @@ import {
   CopyPastorSyncStorageTypes,
   CopyPastorItem,
   CopyPastorMessage,
+  CopyPastorMessageEnum,
 } from "Types/index";
 
 export const copyPastor = {
@@ -66,9 +67,57 @@ const createLinkImg = (href: string): HTMLAnchorElement => {
   link.href = href;
   link.target = "_blank";
   link.classList.add("link");
+  link.title = `visit ${href}`;
   link.appendChild(img);
 
   return link;
+};
+
+const createFavStar = (id: string, favorite: boolean): SVGElement => {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+
+  use.setAttributeNS(
+    "http://www.w3.org/1999/xlink",
+    "xlink:href",
+    "../images/star.svg/#fav-star"
+  );
+
+  svg.appendChild(use);
+  svg.classList.add("fav-star", "link-img");
+  use.classList.toggle("selected", favorite);
+
+  svg.addEventListener("click", (e) => {
+    msgSenderHandler(
+      {
+        msg: CopyPastorMessageEnum["set-favorite"],
+        payload: id,
+      },
+      (resp) => {
+        if (resp.msg === "set-fav") {
+          (e.target as SVGElement).classList.add("selected");
+        }
+
+        if (resp.msg === "unset-fav") {
+          (e.target as SVGElement).classList.remove("selected");
+        }
+      }
+    );
+  });
+
+  return svg;
+};
+
+export const getTimestamp = (): number => new Date().setHours(22, 0, 0, 0);
+
+export const mappedStoredValues = (
+  storage: CopyPastorItem[]
+): Map<string, CopyPastorItem> => {
+  const mappedStoredValues = new Map<string, CopyPastorItem>([]);
+
+  storage.forEach((item) => mappedStoredValues.set(item.id, item));
+
+  return mappedStoredValues;
 };
 
 const createDateHeader = (date: string): HTMLHeadingElement => {
@@ -101,9 +150,11 @@ export const createOrderedList = (
       const span = createSpan(entry.copyText);
       const input = createInput(entry.id);
       const img = createLinkImg(entry.href);
+      const favStar = createFavStar(entry.id, entry.favorite);
 
       li.appendChild(input);
       li.appendChild(img);
+      li.appendChild(favStar);
       li.appendChild(span);
 
       ol.appendChild(li);

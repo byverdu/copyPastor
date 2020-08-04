@@ -1,9 +1,11 @@
-import { copyPastor, getRandomNumber, msgSenderHandler } from "Lib/helper";
+import {
+  copyPastor,
+  getRandomNumber,
+  msgSenderHandler,
+  getTimestamp,
+} from "Lib/helper";
 import { CopyPastorItem, CopyPastorMessageEnum } from "Types";
 
-const dates = [1596442964138, 328402800000, 1387065600000];
-const date = dates[Math.ceil(Math.random() * dates.length - 1)];
-console.log("content date", date);
 document.addEventListener("copy", () => {
   const selectedText =
     document.getSelection().type === "Range"
@@ -15,8 +17,9 @@ document.addEventListener("copy", () => {
     const newItem: CopyPastorItem = {
       href,
       copyText: selectedText,
-      date: dates[Math.ceil(Math.random() * dates.length - 1)],
+      date: getTimestamp(),
       id: getRandomNumber(),
+      favorite: false,
     };
     copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
       const newStorage: CopyPastorItem[] = copyPastorHistory
