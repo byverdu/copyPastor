@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import Tabs from "components/Tabs";
 
 import "styles/popup.scss";
 
@@ -9,8 +10,10 @@ const PopUpPage = () => (
       <button className="btn delete-selected">Delete Selected</button>
       <button className="btn clear-history">Clear History</button>
     </div>
+    <Tabs />
     <div className="history-content" />
-  </div>
+    <div className="favs-content hidden"/>
+  </div>  
 );
 
 export default () => {

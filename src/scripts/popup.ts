@@ -37,12 +37,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearBtn = document.querySelector(".clear-history");
   const deleteBtn = document.querySelector(".delete-selected");
   const historyContent = document.querySelector(".history-content");
+  const favsContent = document.querySelector(".favs-content");
 
-  clearBtn.addEventListener("click", () => {
+  clearBtn.addEventListener("click", (e) => {
     msgSenderHandler(
       { msg: CopyPastorMessageEnum["clear-history"] },
       (response) => {
+        const targetElm = e.target as HTMLElement;
+
         window.location.reload();
+        targetElm.classList.add("hidden");
       }
     );
   });
@@ -62,18 +66,89 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         function () {
           console.log(`copyPastorHistory has been saved`);
-          window.location.reload();
+
+          if (storage.length === 1) {
+            historyContent.textContent = "No items found for copyPastorHistory";
+          } else {
+            window.location.reload();
+          }
         }
       );
     });
   };
 
+  const handleClickFabsTab = (e) => {
+    getStorageValues()
+      .then((storage: CopyPastorItem[]) => {
+        if (storage.length > 0) {
+          const favs = storage.filter((elem) => elem.favorite);
+          const targetElm = e.target as HTMLElement;
+
+          clearBtn.classList.remove("hidden");
+
+          favsContent.innerHTML = "";
+          historyContent.classList.toggle("hidden");
+          favsContent.classList.toggle("hidden");
+
+          if (favs.length > 0) {
+            deleteSelectedHandler(favs);
+            favsContent.appendChild(createOrderedList(favs));
+          } else {
+            favsContent.insertAdjacentHTML(
+              "afterbegin",
+              "<div>No Favorites saved</div/"
+            );
+          }
+
+          document.getElementById("tab-history").classList.toggle("active");
+          targetElm.classList.toggle("active");
+        } else {
+          clearBtn.classList.add("hidden");
+        }
+      })
+      .catch((reason: CopyPastorMessage) => {
+        historyContent.textContent = reason.payload;
+      });
+  };
+
+  const handleClickHistoryTab = (e) => {
+    getStorageValues()
+      .then((history: CopyPastorItem[]) => {
+        if (history.length > 0) {
+          const targetElm = e.target as HTMLElement;
+          clearBtn.classList.remove("hidden");
+          deleteSelectedHandler(history);
+          historyContent.appendChild(createOrderedList(history));
+
+          historyContent.innerHTML = "";
+          historyContent.classList.toggle("hidden");
+          favsContent.classList.toggle("hidden");
+          historyContent.appendChild(createOrderedList(history));
+          document.getElementById("tab-favs").classList.toggle("active");
+          targetElm.classList.toggle("active");
+        } else {
+          clearBtn.classList.add("hidden");
+        }
+      })
+      .catch((reason: CopyPastorMessage) => {
+        historyContent.textContent = reason.payload;
+      });
+  };
+
+  document
+    .getElementById("tab-favs")
+    .addEventListener("click", handleClickFabsTab);
+
+  document
+    .getElementById("tab-history")
+    .addEventListener("click", handleClickHistoryTab);
+
   getStorageValues()
-    .then((storage: CopyPastorItem[]) => {
-      if (storage.length > 0) {
-        deleteSelectedHandler(storage);
+    .then((history: CopyPastorItem[]) => {
+      if (history.length > 0) {
         clearBtn.classList.remove("hidden");
-        historyContent.appendChild(createOrderedList(storage));
+        deleteSelectedHandler(history);
+        historyContent.appendChild(createOrderedList(history));
       } else {
         clearBtn.classList.add("hidden");
       }

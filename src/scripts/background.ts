@@ -42,6 +42,7 @@ msgReceiverHandler((request, sender, sendResponse) => {
     request.msg === CopyPastorMessageEnum["clear-history"]
   ) {
     clearHistoryHandler();
+    sendResponse({ cleared: true });
     return true;
   }
   if (
