@@ -27,9 +27,32 @@ $bg: #ff5722;
       }
     }
 
-    .history {
+    .link {
+      height: 20px;
+
+      &-img {
+        width: 20px;
+        height: 20px;
+        margin-left: 10px;
+        cursor: pointer;
+      }
+    }
+
+    .fav-star {
+      color: transparent;
+      stroke: black;
+
+      .selected {
+        color: orange;
+        stroke: orangered;
+      }
+    }
+
+    .history,
+    .favs {
       &-content {
         font-size: large;
+        margin-top: 10px;
       }
       &-list {
         counter-reset: section;
@@ -42,18 +65,21 @@ $bg: #ff5722;
         align-items: center;
 
         &:nth-child(odd) {
-          background-color: rgba($color: #000000, $alpha: 0.1);
-        }
-
-        &::before {
-          // counter-increment: section;
-          // content: counter(section) ".";
+          background-color: rgba($color: blue, $alpha: 0.1);
         }
 
         span {
           margin-left: 10px;
+          cursor: ew-resize;
         }
       }
+    }
+
+    .hidden {
+      display: none;
+    }
+    .visible {
+      display: block;
     }
   }
 }

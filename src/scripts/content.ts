@@ -1,19 +1,34 @@
-import { copyPastor } from "Lib/helper";
+import {
+  copyPastor,
+  getRandomNumber,
+  msgSenderHandler,
+  getTimestamp,
+} from "Lib/helper";
+import { CopyPastorItem, CopyPastorMessageEnum } from "Types";
 
 document.addEventListener("copy", () => {
   const selectedText =
     document.getSelection().type === "Range"
       ? document.getSelection().toString()
       : undefined;
+  const { href } = location;
 
   if (selectedText) {
+    const newItem: CopyPastorItem = {
+      href,
+      copyText: selectedText,
+      date: getTimestamp(),
+      id: getRandomNumber(),
+      favorite: false,
+    };
     copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
-      const newStorage = copyPastorHistory
-        ? [...copyPastorHistory, selectedText]
-        : [selectedText];
+      const newStorage: CopyPastorItem[] = copyPastorHistory
+        ? [...copyPastorHistory, newItem]
+        : [newItem];
 
-      copyPastor.set({ copyPastorHistory: newStorage }, function () {
-        console.log(`copyPastorHistory length is ${newStorage.length}`);
+      msgSenderHandler({
+        msg: CopyPastorMessageEnum["save-history"],
+        payload: newStorage,
       });
     });
   }
