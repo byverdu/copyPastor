@@ -120,8 +120,8 @@ export const mappedStoredValues = (
   return mappedStoredValues;
 };
 
-const createDateHeader = (date: string): HTMLHeadingElement => {
-  const header = document.createElement("h5");
+const createSummary = (date: string): HTMLElement => {
+  const header = document.createElement("summary");
   header.textContent = date;
 
   return header;
@@ -129,19 +129,20 @@ const createDateHeader = (date: string): HTMLHeadingElement => {
 
 export const createOrderedList = (
   entries: CopyPastorItem[]
-): HTMLDivElement => {
+): HTMLDetailsElement => {
   const dates = [...new Set(entries.map((item) => item.date))].sort(
     (a, b) => b - a
   );
   const entriesCopy = entries.slice();
-  const div = document.createElement("div");
+  const details = document.createElement("details");
+  details.setAttribute("open", "open");
 
   while (dates.length > 0) {
     const dateToString = new Date(dates[0]).toDateString();
     const groupedByDate = entriesCopy.filter(({ date }) => date === dates[0]);
     const ol = document.createElement("ol");
     ol.classList.add("history-list");
-    const header = createDateHeader(dateToString);
+    const header = createSummary(dateToString);
 
     groupedByDate.forEach((entry, index) => {
       const li = document.createElement("li");
@@ -160,13 +161,13 @@ export const createOrderedList = (
       ol.appendChild(li);
     });
 
-    div.appendChild(header);
-    div.appendChild(ol);
+    details.appendChild(header);
+    details.appendChild(ol);
 
     dates.splice(0, 1);
   }
 
-  return div;
+  return details;
 };
 
 export const msgReceiverHandler = (
