@@ -10,11 +10,10 @@
   },
   "permissions": [
     "activeTab",
-    "contextMenus",
+    "unlimitedStorage",
     "storage",
     "clipboardRead",
-    "clipboardWrite",
-    "unlimitedStorage"
+    "clipboardWrite"
   ],
   "background": {
     "scripts": ["scripts/background.js"],
