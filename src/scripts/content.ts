@@ -21,15 +21,24 @@ document.addEventListener("copy", () => {
       id: getRandomNumber(),
       favorite: false,
     };
-    copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
-      const newStorage: CopyPastorItem[] = copyPastorHistory
-        ? [...copyPastorHistory, newItem]
-        : [newItem];
+    try {
+      copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
+        const newStorage: CopyPastorItem[] = copyPastorHistory
+          ? [...copyPastorHistory, newItem]
+          : [newItem];
 
-      msgSenderHandler({
-        msg: CopyPastorMessageEnum["save-history"],
-        payload: newStorage,
+        msgSenderHandler({
+          msg: CopyPastorMessageEnum["save-history"],
+          payload: newStorage,
+        });
       });
-    });
+    } catch (e) {
+      copyPastor.set({ copyPastorHistory: [newItem] }, () => {
+        msgSenderHandler({
+          msg: CopyPastorMessageEnum["save-history"],
+          payload: newItem,
+        });
+      })
+    }
   }
 });

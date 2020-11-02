@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (favs.length > 0) {
             deleteSelectedHandler(favs);
-            favsContent.appendChild(createOrderedList(favs));
+            createOrderedList(favs).forEach(detail => favsContent.appendChild(detail));
           } else {
             favsContent.insertAdjacentHTML(
               "afterbegin",
@@ -118,12 +118,12 @@ document.addEventListener("DOMContentLoaded", () => {
           const targetElm = e.target as HTMLElement;
           clearBtn.classList.remove("hidden");
           deleteSelectedHandler(history);
-          historyContent.appendChild(createOrderedList(history));
+          createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
 
           historyContent.innerHTML = "";
           historyContent.classList.toggle("hidden");
           favsContent.classList.toggle("hidden");
-          historyContent.appendChild(createOrderedList(history));
+          createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
           document.getElementById("tab-favs").classList.toggle("active");
           targetElm.classList.toggle("active");
         } else {
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (history.length > 0) {
         clearBtn.classList.remove("hidden");
         deleteSelectedHandler(history);
-        historyContent.appendChild(createOrderedList(history));
+        createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
       } else {
         clearBtn.classList.add("hidden");
       }
