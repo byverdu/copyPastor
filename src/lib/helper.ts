@@ -9,20 +9,20 @@ import {
 export const copyPastor = {
   set(items: CopyPastorSyncStorage, callback?: () => void) {
     return typeof callback !== "undefined"
-      ? chrome.storage.sync.set(items, callback)
-      : chrome.storage.sync.set(items);
+      ? chrome.storage.local.set(items, callback)
+      : chrome.storage.local.set(items);
   },
   get(
     items: CopyPastorSyncStorageTypes,
     callback: (result: CopyPastorSyncStorage) => void
   ) {
-    return chrome.storage.sync.get(items, callback);
+    return chrome.storage.local.get(items, callback);
   },
   clear() {
-    return chrome.storage.sync.clear();
+    return chrome.storage.local.clear();
   },
   remove(key: string | string[], callback?: () => void) {
-    return chrome.storage.sync.remove(key, callback);
+    return chrome.storage.local.remove(key, callback);
   },
 };
 
