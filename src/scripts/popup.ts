@@ -5,7 +5,6 @@ import {
   mappedStoredValues,
 } from "Lib/helper";
 import {
-  CopyPastorSyncStorageTypes,
   CopyPastorMessage,
   CopyPastorMessageEnum,
   CopyPastorItem,
@@ -15,18 +14,16 @@ chrome.runtime.onInstalled.addListener(function () {
   chrome.browserAction.setTitle({ title: "Aloha" });
 });
 
-function getStorageValues(
-  storageType: CopyPastorSyncStorageTypes = "copyPastorHistory"
-) {
+function getStorageValues() {
   return new Promise((resolve, reject: (reason: CopyPastorMessage) => void) => {
-    copyPastor.get([storageType], function (result) {
+    copyPastor.get("copyPastorHistory", function (result) {
       if (result && result.copyPastorHistory) {
         resolve(result.copyPastorHistory);
       } else {
         reject({
-          type: `${storageType} Empty`,
+          type: 'copyPastorHistory Empty',
           msg: CopyPastorMessageEnum.error,
-          payload: `No items found for ${storageType}`,
+          payload: 'No items found for copyPastorHistory',
         });
       }
     });
@@ -92,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           if (favs.length > 0) {
             deleteSelectedHandler(favs);
-            favsContent.appendChild(createOrderedList(favs));
+            createOrderedList(favs).forEach(detail => favsContent.appendChild(detail));
           } else {
             favsContent.insertAdjacentHTML(
               "afterbegin",
@@ -118,12 +115,12 @@ document.addEventListener("DOMContentLoaded", () => {
           const targetElm = e.target as HTMLElement;
           clearBtn.classList.remove("hidden");
           deleteSelectedHandler(history);
-          historyContent.appendChild(createOrderedList(history));
+          createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
 
           historyContent.innerHTML = "";
           historyContent.classList.toggle("hidden");
           favsContent.classList.toggle("hidden");
-          historyContent.appendChild(createOrderedList(history));
+          createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
           document.getElementById("tab-favs").classList.toggle("active");
           targetElm.classList.toggle("active");
         } else {
@@ -148,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (history.length > 0) {
         clearBtn.classList.remove("hidden");
         deleteSelectedHandler(history);
-        historyContent.appendChild(createOrderedList(history));
+        createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
       } else {
         clearBtn.classList.add("hidden");
       }

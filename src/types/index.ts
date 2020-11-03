@@ -1,4 +1,4 @@
-export type CopyPastorSyncStorageTypes = "copyPastorHistory" | "copyPastorFavs";
+export type CopyPastorSyncStorageTypes = "copyPastorHistory";
 
 export type CopyPastorItem = {
   href: string;
@@ -16,7 +16,7 @@ export type CopyPastorMessageType =
   | "set-favorite";
 
 export type CopyPastorSyncStorage = {
-  [prop in CopyPastorSyncStorageTypes]?: CopyPastorItem[];
+  copyPastorHistory: CopyPastorItem[];
 };
 
 export interface CopyPastorMessage {

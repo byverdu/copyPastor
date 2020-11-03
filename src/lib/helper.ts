@@ -9,20 +9,20 @@ import {
 export const copyPastor = {
   set(items: CopyPastorSyncStorage, callback?: () => void) {
     return typeof callback !== "undefined"
-      ? chrome.storage.sync.set(items, callback)
-      : chrome.storage.sync.set(items);
+      ? chrome.storage.local.set(items, callback)
+      : chrome.storage.local.set(items);
   },
   get(
-    items: CopyPastorSyncStorageTypes[],
+    items: CopyPastorSyncStorageTypes,
     callback: (result: CopyPastorSyncStorage) => void
   ) {
-    return chrome.storage.sync.get(items, callback);
+    return chrome.storage.local.get(items, callback);
   },
   clear() {
-    return chrome.storage.sync.clear();
+    return chrome.storage.local.clear();
   },
   remove(key: string | string[], callback?: () => void) {
-    return chrome.storage.sync.remove(key, callback);
+    return chrome.storage.local.remove(key, callback);
   },
 };
 
@@ -129,15 +129,16 @@ const createSummary = (date: string): HTMLElement => {
 
 export const createOrderedList = (
   entries: CopyPastorItem[]
-): HTMLDetailsElement => {
+): HTMLDetailsElement[] => {
   const dates = [...new Set(entries.map((item) => item.date))].sort(
     (a, b) => b - a
   );
   const entriesCopy = entries.slice();
-  const details = document.createElement("details");
-  details.setAttribute("open", "open");
+  const details = [];
 
   while (dates.length > 0) {
+    const detail = document.createElement("details");
+    detail.setAttribute("open", "open");
     const dateToString = new Date(dates[0]).toDateString();
     const groupedByDate = entriesCopy.filter(({ date }) => date === dates[0]);
     const ol = document.createElement("ol");
@@ -161,10 +162,11 @@ export const createOrderedList = (
       ol.appendChild(li);
     });
 
-    details.appendChild(header);
-    details.appendChild(ol);
+    detail.appendChild(header);
+    detail.appendChild(ol);
 
     dates.splice(0, 1);
+    details.push(detail)
   }
 
   return details;
