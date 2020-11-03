@@ -16,7 +16,7 @@ const setFavoriteHandler = async (
   id: string
 ): Promise<{ msg: string } | undefined> =>
   new Promise((resolve) =>
-    copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
+    copyPastor.get("copyPastorHistory", ({ copyPastorHistory }) => {
       const mappedStored = mappedStoredValues(copyPastorHistory);
       const itemToEdit = mappedStored.get(id);
 

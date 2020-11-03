@@ -5,7 +5,6 @@ import {
   mappedStoredValues,
 } from "Lib/helper";
 import {
-  CopyPastorSyncStorageTypes,
   CopyPastorMessage,
   CopyPastorMessageEnum,
   CopyPastorItem,
@@ -15,18 +14,16 @@ chrome.runtime.onInstalled.addListener(function () {
   chrome.browserAction.setTitle({ title: "Aloha" });
 });
 
-function getStorageValues(
-  storageType: CopyPastorSyncStorageTypes = "copyPastorHistory"
-) {
+function getStorageValues() {
   return new Promise((resolve, reject: (reason: CopyPastorMessage) => void) => {
-    copyPastor.get([storageType], function (result) {
+    copyPastor.get("copyPastorHistory", function (result) {
       if (result && result.copyPastorHistory) {
         resolve(result.copyPastorHistory);
       } else {
         reject({
-          type: `${storageType} Empty`,
+          type: 'copyPastorHistory Empty',
           msg: CopyPastorMessageEnum.error,
-          payload: `No items found for ${storageType}`,
+          payload: 'No items found for copyPastorHistory',
         });
       }
     });

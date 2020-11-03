@@ -13,7 +13,7 @@ export const copyPastor = {
       : chrome.storage.sync.set(items);
   },
   get(
-    items: CopyPastorSyncStorageTypes[],
+    items: CopyPastorSyncStorageTypes,
     callback: (result: CopyPastorSyncStorage) => void
   ) {
     return chrome.storage.sync.get(items, callback);

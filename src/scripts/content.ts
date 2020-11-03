@@ -22,7 +22,7 @@ document.addEventListener("copy", () => {
       favorite: false,
     };
     try {
-      copyPastor.get(["copyPastorHistory"], ({ copyPastorHistory }) => {
+      copyPastor.get("copyPastorHistory", ({ copyPastorHistory }) => {
         const newStorage: CopyPastorItem[] = copyPastorHistory
           ? [...copyPastorHistory, newItem]
           : [newItem];
