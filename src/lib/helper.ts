@@ -3,7 +3,6 @@ import {
   CopyPastorSyncStorageTypes,
   CopyPastorItem,
   CopyPastorMessage,
-  CopyPastorMessageEnum,
 } from "Types/index";
 
 export const copyPastor = {
@@ -90,7 +89,7 @@ const createFavStar = (id: string, favorite: boolean): SVGElement => {
   svg.addEventListener("click", (e) => {
     msgSenderHandler(
       {
-        msg: CopyPastorMessageEnum["set-favorite"],
+        msg: 'set-favorite',
         payload: id,
       },
       (resp) => {

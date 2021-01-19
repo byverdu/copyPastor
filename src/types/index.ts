@@ -9,6 +9,7 @@ export type CopyPastorItem = {
 };
 
 export type CopyPastorMessageType =
+  | "get-storage"
   | "save-history"
   | "delete-selected"
   | "error"
@@ -23,12 +24,4 @@ export interface CopyPastorMessage {
   type?: CopyPastorSyncStorageTypes | string;
   msg: CopyPastorMessageType;
   payload?: any;
-}
-
-export enum CopyPastorMessageEnum {
-  "save-history" = "save-history",
-  "delete-selected" = "delete-selected",
-  "error" = "error",
-  "set-favorite" = "set-favorite",
-  "clear-history" = "clear-history",
 }

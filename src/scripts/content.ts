@@ -3,7 +3,6 @@ import {
   msgSenderHandler,
   getTimestamp,
 } from "Lib/helper";
-import { CopyPastorMessageEnum } from "Types";
 
 // Content script
 function main() {
@@ -17,7 +16,7 @@ function main() {
 
     if (selectedText) {
       msgSenderHandler({
-        msg: CopyPastorMessageEnum["save-history"],
+        msg: 'save-history',
         payload: {
           href,
           copyText: selectedText,

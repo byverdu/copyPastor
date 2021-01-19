@@ -6,7 +6,6 @@ import {
 } from "Lib/helper";
 import {
   CopyPastorMessage,
-  CopyPastorMessageEnum,
   CopyPastorItem,
 } from "Types/index";
 
@@ -16,17 +15,20 @@ chrome.runtime.onInstalled.addListener(function () {
 
 function getStorageValues() {
   return new Promise((resolve, reject: (reason: CopyPastorMessage) => void) => {
-    copyPastor.get("copyPastorHistory", function (result) {
-      if (result && result.copyPastorHistory) {
-        resolve(result.copyPastorHistory);
-      } else {
-        reject({
-          type: 'copyPastorHistory Empty',
-          msg: CopyPastorMessageEnum.error,
-          payload: 'No items found for copyPastorHistory',
-        });
+    msgSenderHandler(
+      { msg: 'get-storage' },
+      (response) => {
+        if (response && response.copyPastorHistory) {
+          resolve(response.copyPastorHistory);
+        } else {
+          reject({
+            type: 'copyPastorHistory Empty',
+            msg: 'error',
+            payload: 'No items found for copyPastorHistory',
+          });
+        }
       }
-    });
+    );
   });
 }
 
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   clearBtn.addEventListener("click", (e) => {
     msgSenderHandler(
-      { msg: CopyPastorMessageEnum["clear-history"] },
+      { msg: 'clear-history' },
       (response) => {
         const targetElm = e.target as HTMLElement;
 
@@ -57,17 +59,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       itemsToDelete.forEach((item) => mappedStored.delete(item));
 
-      copyPastor.set(
-        {
-          copyPastorHistory: [...mappedStored.values()],
-        },
-        function () {
-          console.log(`copyPastorHistory has been saved`);
+      msgSenderHandler(
+        { msg: 'delete-selected', payload: [...mappedStored.values()] },
+        (response) => {
+          if (response) {
+            console.log(`copyPastorHistory has been saved`);
 
-          if (storage.length === 1) {
-            historyContent.textContent = "No items found for copyPastorHistory";
-          } else {
-            window.location.reload();
+            if (storage.length === 1) {
+              historyContent.textContent = "No items found for copyPastorHistory";
+            } else {
+              window.location.reload();
+            }
           }
         }
       );
@@ -93,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             favsContent.insertAdjacentHTML(
               "afterbegin",
-              "<div>No Favorites saved</div/"
+              "<div>No Favorites saved</div>"
             );
           }
 

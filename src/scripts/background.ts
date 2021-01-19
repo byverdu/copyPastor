@@ -1,7 +1,6 @@
 import { copyPastor, msgReceiverHandler, mappedStoredValues } from "Lib/helper";
-import { CopyPastorItem, CopyPastorMessageEnum } from "Types";
+import { CopyPastorItem } from "Types";
 
-const clearHistoryHandler = () => copyPastor.remove("copyPastorHistory");
 
 const saveHistoryHandler = (
   payload: CopyPastorItem,
@@ -42,29 +41,39 @@ const setFavoriteHandler = async (
 msgReceiverHandler((request, sender, sendResponse) => {
   if (request && request.msg) {
     switch (request.msg) {
-      case CopyPastorMessageEnum["clear-history"]:
-        {
-          clearHistoryHandler();
-          sendResponse({ cleared: true });
-          return true;
-        }
+      case 'get-storage': {
+        copyPastor.get('copyPastorHistory', (response) => sendResponse(response))
 
-      case CopyPastorMessageEnum["save-history"]:
-        {
-          chrome.browserAction.setBadgeText({ text: "+ 1" });
-          chrome.browserAction.setBadgeBackgroundColor({ color: "#00A86B" });
+        return true
+      }
+      case "clear-history": {
+        copyPastor.remove("copyPastorHistory", () => sendResponse({ cleared: true }));
 
-          saveHistoryHandler(request.payload, () =>
-            chrome.browserAction.setBadgeText({ text: "" })
-          );
-          return true;
-        }
+        return true;
+      }
 
-      case CopyPastorMessageEnum["set-favorite"]:
-        {
-          setFavoriteHandler(request.payload).then((resp) => sendResponse(resp));
-          return true;
-        }
+      case "save-history": {
+        chrome.browserAction.setBadgeText({ text: "+ 1" });
+        chrome.browserAction.setBadgeBackgroundColor({ color: "#00A86B" });
+
+        saveHistoryHandler(request.payload, () =>
+          chrome.browserAction.setBadgeText({ text: "" })
+        );
+
+        return true;
+      }
+
+      case "set-favorite": {
+        setFavoriteHandler(request.payload).then((resp) => { sendResponse(resp) });
+
+        return true;
+      }
+
+      case 'delete-selected': {
+        copyPastor.set({ copyPastorHistory: request.payload }, () => sendResponse(true));
+
+        return true;
+      }
     }
   } else {
     console.error('Request not identified')
