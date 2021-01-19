@@ -4,13 +4,17 @@ import { CopyPastorItem, CopyPastorMessageEnum } from "Types";
 const clearHistoryHandler = () => copyPastor.remove("copyPastorHistory");
 
 const saveHistoryHandler = (
-  copyPastorHistory: CopyPastorItem[],
+  payload: CopyPastorItem,
   callback: () => void
-) =>
-  copyPastor.set({ copyPastorHistory }, () => {
-    console.log(`copyPastorHistory length is ${copyPastorHistory.length}`);
-    setTimeout(callback, 2000);
+) => {
+  copyPastor.get("copyPastorHistory", ({ copyPastorHistory }) => {
+    const newStorage: CopyPastorItem[] = copyPastorHistory
+      ? [...copyPastorHistory, payload]
+      : [payload];
+
+    copyPastor.set({ copyPastorHistory: newStorage }, () => setTimeout(callback, 2000));
   });
+}
 
 const setFavoriteHandler = async (
   id: string
@@ -67,3 +71,15 @@ msgReceiverHandler((request, sender, sendResponse) => {
     return true;
   }
 });
+
+
+function installScript() {
+  chrome.tabs.query({}, tabs => {
+    const contentjsFile = chrome.runtime.getManifest().content_scripts[0].js[0]
+    tabs.forEach(tab => chrome.tabs.executeScript(tab.id, { file: `./${contentjsFile}` }))
+  })
+}
+
+// workaround to be able to use extension for old opened tabs
+// after the extension is installed
+chrome.tabs.onUpdated.addListener(installScript)
