@@ -76,10 +76,19 @@ msgReceiverHandler((request, sender, sendResponse) => {
 function installScript() {
   chrome.tabs.query({}, tabs => {
     const contentjsFile = chrome.runtime.getManifest().content_scripts[0].js[0]
-    tabs.forEach(tab => chrome.tabs.executeScript(tab.id, { file: `./${contentjsFile}` }))
+    tabs.forEach(tab => {
+      chrome.tabs.executeScript(tab.id, { file: `./${contentjsFile}` }, (result) => {
+        console.log(result)
+
+        if (chrome.runtime.lastError) {
+          return
+        }
+      })
+    })
   })
 }
 
 // workaround to be able to use extension for old opened tabs
-// after the extension is installed
-chrome.tabs.onUpdated.addListener(installScript)
+// after the extension is installed. For those tabs an error will be thrown in the console
+// due to the chrome.runtime.id has changed after updating the extension
+chrome.runtime.onInstalled.addListener(installScript)
