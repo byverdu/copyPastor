@@ -40,35 +40,34 @@ const setFavoriteHandler = async (
   );
 
 msgReceiverHandler((request, sender, sendResponse) => {
-  if (
-    request &&
-    request.msg &&
-    request.msg === CopyPastorMessageEnum["clear-history"]
-  ) {
-    clearHistoryHandler();
-    sendResponse({ cleared: true });
-    return true;
-  }
-  if (
-    request &&
-    request.msg &&
-    request.msg === CopyPastorMessageEnum["save-history"]
-  ) {
-    chrome.browserAction.setBadgeText({ text: "+ 1" });
-    chrome.browserAction.setBadgeBackgroundColor({ color: "#00A86B" });
+  if (request && request.msg) {
+    switch (request.msg) {
+      case CopyPastorMessageEnum["clear-history"]:
+        {
+          clearHistoryHandler();
+          sendResponse({ cleared: true });
+          return true;
+        }
 
-    saveHistoryHandler(request.payload, () =>
-      chrome.browserAction.setBadgeText({ text: "" })
-    );
-    return true;
-  }
-  if (
-    request &&
-    request.msg &&
-    request.msg === CopyPastorMessageEnum["set-favorite"]
-  ) {
-    setFavoriteHandler(request.payload).then((resp) => sendResponse(resp));
-    return true;
+      case CopyPastorMessageEnum["save-history"]:
+        {
+          chrome.browserAction.setBadgeText({ text: "+ 1" });
+          chrome.browserAction.setBadgeBackgroundColor({ color: "#00A86B" });
+
+          saveHistoryHandler(request.payload, () =>
+            chrome.browserAction.setBadgeText({ text: "" })
+          );
+          return true;
+        }
+
+      case CopyPastorMessageEnum["set-favorite"]:
+        {
+          setFavoriteHandler(request.payload).then((resp) => sendResponse(resp));
+          return true;
+        }
+    }
+  } else {
+    console.error('Request not identified')
   }
 });
 
