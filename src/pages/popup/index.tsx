@@ -4,16 +4,40 @@ import Tabs from "components/Tabs";
 
 import "styles/popup.scss";
 
+const ButtonsGroup = () => {
+  const btns = [
+    {
+      text: "Delete Selected",
+      className: "delete-selected",
+    },
+    {
+      text: "Delete Favorites",
+      className: "delete-favs",
+    },
+    {
+      text: "Delete Non Favorites",
+      className: "delete-no-favs",
+    },
+    {
+      text: "Clear History",
+      className: "clear-history",
+    },
+  ].map(({ className, text }) => (
+    <button key={className} className={`btn ${className}`}>
+      {text}
+    </button>
+  ));
+
+  return <div className="btn-wrapper">{btns}</div>;
+};
+
 const PopUpPage = () => (
   <div className="popup-container">
-    <div className="btn-wrapper">
-      <button className="btn delete-selected">Delete Selected</button>
-      <button className="btn clear-history">Clear History</button>
-    </div>
+    <ButtonsGroup />
     <Tabs />
     <div className="history-content" />
-    <div className="favs-content hidden"/>
-  </div>  
+    <div className="favs-content hidden" />
+  </div>
 );
 
 export default () => {

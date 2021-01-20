@@ -33,10 +33,13 @@ function getStorageValues() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const clearBtn = document.querySelector(".clear-history");
-  const deleteBtn = document.querySelector(".delete-selected");
   const historyContent = document.querySelector(".history-content");
   const favsContent = document.querySelector(".favs-content");
+
+  const deleteBtn = document.querySelector(".delete-selected");
+  const clearBtn = document.querySelector(".clear-history");
+  const deleteFavsBtn = document.querySelector(".delete-favs");
+  const deleteNonFavsBtn = document.querySelector(".delete-no-favs");
 
   clearBtn.addEventListener("click", (e) => {
     msgSenderHandler(
@@ -46,6 +49,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.location.reload();
         targetElm.classList.add("hidden");
+      }
+    );
+  });
+
+  deleteFavsBtn.addEventListener("click", (e) => {
+    msgSenderHandler(
+      { msg: 'delete-favs' },
+      (response) => {
+        if (response) {
+          favsContent.innerHTML = "";
+          favsContent.insertAdjacentHTML(
+            "afterbegin",
+            "<div>No Favorites saved</div>"
+          );
+        }
+      }
+    );
+  });
+
+  deleteNonFavsBtn.addEventListener("click", (e) => {
+    msgSenderHandler(
+      { msg: 'delete-no-favs' },
+      (response) => {
+        if (response) {
+          window.location.reload()
+        }
       }
     );
   });

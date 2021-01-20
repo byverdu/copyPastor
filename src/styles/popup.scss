@@ -7,23 +7,25 @@ $bg: #ff5722;
     font-family: monospace;
     .btn {
       outline: none;
-      border: 2px solid $bg;
+      border: none;
       color: $bg;
       cursor: pointer;
       background: none;
-      font-size: 24px;
+      font-size: 20px;
       border-radius: 5px;
       font-family: "Lato", sans-serif;
+      font-weight: 100;
       margin: 10px;
+      padding: 5px;
       &:hover {
         border: none;
         color: white;
-        font-size: 28px;
         background-color: $bg;
       }
 
       &-wrapper {
         display: flex;
+        justify-content: space-between;
       }
     }
 

@@ -1,5 +1,4 @@
 .tabs {
-  
   .header {
     align-items: center;
     display: flex;
@@ -20,6 +19,10 @@
     }
     &:last-child {
       border-right: 1px solid;
+    }
+
+    &:hover {
+      cursor: pointer;
     }
   }
 

@@ -14,7 +14,9 @@ export type CopyPastorMessageType =
   | "delete-selected"
   | "error"
   | "clear-history"
-  | "set-favorite";
+  | "set-favorite"
+  | "delete-favs"
+  | "delete-no-favs";
 
 export type CopyPastorSyncStorage = {
   copyPastorHistory: CopyPastorItem[];

@@ -74,7 +74,30 @@ msgReceiverHandler((request, sender, sendResponse) => {
 
         return true;
       }
+
+      case "delete-favs": {
+        copyPastor.get('copyPastorHistory', ({ copyPastorHistory }) => {
+          if (copyPastorHistory) {
+            const nonFavItems = copyPastorHistory.filter(item => !item.favorite)
+            copyPastor.set({ copyPastorHistory: nonFavItems }, () => sendResponse(true));
+          }
+        })
+
+        return true;
+      }
+
+      case "delete-no-favs": {
+        copyPastor.get('copyPastorHistory', ({ copyPastorHistory }) => {
+          if (copyPastorHistory) {
+            const favItems = copyPastorHistory.filter(item => item.favorite)
+            copyPastor.set({ copyPastorHistory: favItems }, () => sendResponse(true));
+          }
+        })
+
+        return true;
+      }
     }
+
   } else {
     console.error('Request not identified')
   }
