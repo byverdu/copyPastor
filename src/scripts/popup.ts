@@ -32,52 +32,72 @@ function getStorageValues() {
   });
 }
 
+function clearAllHandler(e) {
+  msgSenderHandler(
+    { msg: 'clear-history' },
+    () => {
+      const targetElm = e.target as HTMLElement;
+
+      window.location.reload();
+      targetElm.classList.add("hidden");
+    }
+  );
+}
+
+function deleteFavsHandler() {
+  msgSenderHandler(
+    { msg: 'delete-favs' },
+    (response) => {
+      if (response) {
+        const favsContent = document.querySelector(".favs-content");
+
+        favsContent.innerHTML = "";
+        favsContent.insertAdjacentHTML(
+          "afterbegin",
+          "<div>No Favorites saved</div>"
+        );
+      }
+    }
+  );
+}
+
+function deleteNonFavsHandler() {
+  msgSenderHandler(
+    { msg: 'delete-no-favs' },
+    (response) => {
+      if (response) {
+        window.location.reload()
+      }
+    }
+  );
+}
+
+const deleteActions = [
+  {
+    selector: '.clear-history',
+    callback: clearAllHandler
+  },
+  {
+    selector: '.delete-favs',
+    callback: deleteFavsHandler
+  },
+  {
+    selector: '.delete-no-favs',
+    callback: deleteNonFavsHandler
+  }
+]
+
 document.addEventListener("DOMContentLoaded", () => {
   const historyContent = document.querySelector(".history-content");
   const favsContent = document.querySelector(".favs-content");
 
   const deleteBtn = document.querySelector(".delete-selected");
   const clearBtn = document.querySelector(".clear-history");
-  const deleteFavsBtn = document.querySelector(".delete-favs");
-  const deleteNonFavsBtn = document.querySelector(".delete-no-favs");
 
-  clearBtn.addEventListener("click", (e) => {
-    msgSenderHandler(
-      { msg: 'clear-history' },
-      (response) => {
-        const targetElm = e.target as HTMLElement;
-
-        window.location.reload();
-        targetElm.classList.add("hidden");
-      }
-    );
-  });
-
-  deleteFavsBtn.addEventListener("click", (e) => {
-    msgSenderHandler(
-      { msg: 'delete-favs' },
-      (response) => {
-        if (response) {
-          favsContent.innerHTML = "";
-          favsContent.insertAdjacentHTML(
-            "afterbegin",
-            "<div>No Favorites saved</div>"
-          );
-        }
-      }
-    );
-  });
-
-  deleteNonFavsBtn.addEventListener("click", (e) => {
-    msgSenderHandler(
-      { msg: 'delete-no-favs' },
-      (response) => {
-        if (response) {
-          window.location.reload()
-        }
-      }
-    );
-  });
+  deleteActions.forEach(({ selector, callback }) => {
+    document.querySelector(`${selector}`)
+      .addEventListener('click', callback, { once: true })
+  })
 
   const deleteSelectedHandler = (storage: CopyPastorItem[]) => {
     deleteBtn.addEventListener("click", () => {
