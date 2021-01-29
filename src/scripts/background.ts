@@ -47,7 +47,7 @@ msgReceiverHandler((request, sender, sendResponse) => {
         return true
       }
       case "clear-history": {
-        copyPastor.remove("copyPastorHistory", () => sendResponse({ cleared: true }));
+        copyPastor.remove("copyPastorHistory", () => sendResponse(true));
 
         return true;
       }

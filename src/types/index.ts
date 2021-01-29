@@ -18,6 +18,8 @@ export type CopyPastorMessageType =
   | "delete-favs"
   | "delete-no-favs";
 
+export type TabsTypes = 'history' | 'favs';
+
 export type CopyPastorSyncStorage = {
   copyPastorHistory: CopyPastorItem[];
 };

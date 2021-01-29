@@ -1,17 +1,14 @@
 import {
   createOrderedList,
-  copyPastor,
   msgSenderHandler,
   mappedStoredValues,
 } from "Lib/helper";
 import {
   CopyPastorMessage,
   CopyPastorItem,
+  TabsTypes,
+  CopyPastorMessageType
 } from "Types/index";
-
-chrome.runtime.onInstalled.addListener(function () {
-  chrome.browserAction.setTitle({ title: "Aloha" });
-});
 
 function getStorageValues() {
   return new Promise((resolve, reject: (reason: CopyPastorMessage) => void) => {
@@ -32,39 +29,10 @@ function getStorageValues() {
   });
 }
 
-function clearAllHandler(e) {
+function deleteItemsHandler(msg: CopyPastorMessageType) {
   msgSenderHandler(
-    { msg: 'clear-history' },
-    () => {
-      const targetElm = e.target as HTMLElement;
-
-      window.location.reload();
-      targetElm.classList.add("hidden");
-    }
-  );
-}
-
-function deleteFavsHandler() {
-  msgSenderHandler(
-    { msg: 'delete-favs' },
-    (response) => {
-      if (response) {
-        const favsContent = document.querySelector(".favs-content");
-
-        favsContent.innerHTML = "";
-        favsContent.insertAdjacentHTML(
-          "afterbegin",
-          "<div>No Favorites saved</div>"
-        );
-      }
-    }
-  );
-}
-
-function deleteNonFavsHandler() {
-  msgSenderHandler(
-    { msg: 'delete-no-favs' },
-    (response) => {
+    { msg },
+    response => {
       if (response) {
         window.location.reload()
       }
@@ -72,32 +40,62 @@ function deleteNonFavsHandler() {
   );
 }
 
-const deleteActions = [
-  {
-    selector: '.clear-history',
-    callback: clearAllHandler
-  },
-  {
-    selector: '.delete-favs',
-    callback: deleteFavsHandler
-  },
-  {
-    selector: '.delete-no-favs',
-    callback: deleteNonFavsHandler
-  }
+const deleteActions: CopyPastorMessageType[] = [
+  'clear-history',
+  'delete-favs',
+  'delete-no-favs',
 ]
+
+const tabsContentTypes: Array<TabsTypes> = ['favs', 'history'];
 
 document.addEventListener("DOMContentLoaded", () => {
   const historyContent = document.querySelector(".history-content");
   const favsContent = document.querySelector(".favs-content");
-
   const deleteBtn = document.querySelector(".delete-selected");
-  const clearBtn = document.querySelector(".clear-history");
 
-  deleteActions.forEach(({ selector, callback }) => {
-    document.querySelector(`${selector}`)
-      .addEventListener('click', callback, { once: true })
-  })
+  deleteActions.forEach(selector => {
+    document.querySelector(`.${selector}`)
+      .addEventListener('click', () => deleteItemsHandler(selector), { once: true })
+  });
+
+  const clickTabsHandler = (event: Event) => {
+    getStorageValues()
+      .then((storage: CopyPastorItem[]) => {
+        const targetElm = event.target as HTMLElement;
+        const currentTabType = targetElm.dataset.tabType;
+        const previousTabType = tabsContentTypes.find(item => item !== currentTabType)
+        const tabsItem = currentTabType === 'favs' ?
+          storage.filter((elem) => elem.favorite) :
+          storage;
+        const tabsContent: { [key in TabsTypes]: Element } = {
+          favs: favsContent,
+          history: historyContent
+        }
+        const actualTabContent = tabsContent[currentTabType]
+        const otherTabContent = tabsContent[previousTabType]
+
+        actualTabContent.innerHTML = "";
+        actualTabContent.classList.toggle("hidden");
+        otherTabContent.classList.toggle("hidden");
+
+        if (tabsItem.length > 0) {
+          deleteSelectedHandler(tabsItem);
+          createOrderedList(tabsItem).forEach(detail => actualTabContent.appendChild(detail));
+        } else {
+          actualTabContent.insertAdjacentHTML(
+            "afterbegin",
+            `<div>No ${currentTabType} saved</div>`
+          );
+        }
+
+        document.getElementById(`tab-${currentTabType}`).classList.toggle("active");
+        targetElm.classList.toggle("active");
+
+      })
+      .catch((reason: CopyPastorMessage) => {
+        historyContent.textContent = reason.payload;
+      });
+  }
 
   const deleteSelectedHandler = (storage: CopyPastorItem[]) => {
     deleteBtn.addEventListener("click", () => {
@@ -125,80 +123,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  const handleClickFabsTab = (e) => {
-    getStorageValues()
-      .then((storage: CopyPastorItem[]) => {
-        if (storage.length > 0) {
-          const favs = storage.filter((elem) => elem.favorite);
-          const targetElm = e.target as HTMLElement;
-
-          clearBtn.classList.remove("hidden");
-
-          favsContent.innerHTML = "";
-          historyContent.classList.toggle("hidden");
-          favsContent.classList.toggle("hidden");
-
-          if (favs.length > 0) {
-            deleteSelectedHandler(favs);
-            createOrderedList(favs).forEach(detail => favsContent.appendChild(detail));
-          } else {
-            favsContent.insertAdjacentHTML(
-              "afterbegin",
-              "<div>No Favorites saved</div>"
-            );
-          }
-
-          document.getElementById("tab-history").classList.toggle("active");
-          targetElm.classList.toggle("active");
-        } else {
-          clearBtn.classList.add("hidden");
-        }
-      })
-      .catch((reason: CopyPastorMessage) => {
-        historyContent.textContent = reason.payload;
-      });
-  };
-
-  const handleClickHistoryTab = (e) => {
-    getStorageValues()
-      .then((history: CopyPastorItem[]) => {
-        if (history.length > 0) {
-          const targetElm = e.target as HTMLElement;
-          clearBtn.classList.remove("hidden");
-          deleteSelectedHandler(history);
-          createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
-
-          historyContent.innerHTML = "";
-          historyContent.classList.toggle("hidden");
-          favsContent.classList.toggle("hidden");
-          createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
-          document.getElementById("tab-favs").classList.toggle("active");
-          targetElm.classList.toggle("active");
-        } else {
-          clearBtn.classList.add("hidden");
-        }
-      })
-      .catch((reason: CopyPastorMessage) => {
-        historyContent.textContent = reason.payload;
-      });
-  };
-
   document
-    .getElementById("tab-favs")
-    .addEventListener("click", handleClickFabsTab);
-
-  document
-    .getElementById("tab-history")
-    .addEventListener("click", handleClickHistoryTab);
+    .querySelectorAll('[data-tabs]')
+    .forEach(elem => elem.addEventListener('click', clickTabsHandler))
 
   getStorageValues()
     .then((history: CopyPastorItem[]) => {
       if (history.length > 0) {
-        clearBtn.classList.remove("hidden");
         deleteSelectedHandler(history);
         createOrderedList(history).forEach(detail => historyContent.appendChild(detail));
       } else {
-        clearBtn.classList.add("hidden");
+        historyContent.textContent = "No items found for copyPastorHistory";
       }
     })
     .catch((reason: CopyPastorMessage) => {
